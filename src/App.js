@@ -32,7 +32,7 @@ export default function App() {
             <Route path="blog/add" element={<Blog />} />
             <Route path="blog/list" element={<Listblog />} />
             <Route path="blog/categories" element={<Categories />} />
-            {/* <Route path="blog/edit/:id" element={<EditBlog />} /> */}
+            <Route path="blog/edit/:id" element={<EditBlog />} />
           </Route>
         </Routes>
       </Router>
