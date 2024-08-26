@@ -68,6 +68,10 @@ export default function Product() {
     fetchProductDetails();
   }, [products]);
 
+
+
+  console.log(products)
+
   const checkContent = (slug) => {
     const detail = productDetail.find((item) => item.slug === slug);
     if (detail && detail.content !== null) {
@@ -143,6 +147,7 @@ export default function Product() {
                 >
                   <th>Name</th>
                   <th>Image</th>
+                  <th>Image 3D</th>
                   <th>Check content</th>
                   <th>Model Number</th>
                   <th>Custom ID</th>
@@ -156,6 +161,13 @@ export default function Product() {
                     <td>
                       <img
                         src={product.image}
+                        style={{ width: "100px", height: "auto" }}
+                        alt="product"
+                      />
+                    </td>
+                    <td>
+                      <img
+                        src={product.url_image}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -195,6 +207,7 @@ export default function Product() {
                 >
                   <th>Name</th>
                   <th>Image</th>
+                  <th>Image 3D</th>
                   <th>Check content</th>
                   <th>Model Number</th>
                   <th>Custom ID</th>
@@ -208,6 +221,13 @@ export default function Product() {
                     <td>
                       <img
                         src={product.image}
+                        style={{ width: "100px", height: "auto" }}
+                        alt="product"
+                      />
+                    </td>
+                    <td>
+                      <img
+                        src={product.url_image}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -247,6 +267,7 @@ export default function Product() {
                 >
                   <th>Name</th>
                   <th>Image</th>
+                  <th>Image 3D</th>
                   <th>Check content</th>
                   <th>Model Number</th>
                   <th>Custom ID</th>
@@ -260,6 +281,13 @@ export default function Product() {
                     <td>
                       <img
                         src={product.image}
+                        style={{ width: "100px", height: "auto" }}
+                        alt="product"
+                      />
+                    </td>
+                    <td>
+                      <img
+                        src={product.url_image}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -299,6 +327,7 @@ export default function Product() {
                 >
                   <th>Name</th>
                   <th>Image</th>
+                  <th>Image 3D</th>
                   <th>Check content</th>
                   <th>Model Number</th>
                   <th>Custom ID</th>
@@ -312,6 +341,13 @@ export default function Product() {
                     <td>
                       <img
                         src={product.image}
+                        style={{ width: "100px", height: "auto" }}
+                        alt="product"
+                      />
+                    </td>
+                    <td>
+                      <img
+                        src={product.url_image}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />

@@ -3,11 +3,10 @@ import { Form, Upload, Modal, Input, Button, Spin, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 
-const UploadImgs = () => {
+const UploadImg3D = ({productId}) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-  const [productId, setProductId] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +50,6 @@ const UploadImgs = () => {
 
       message.success("All images uploaded successfully");
       setFileList([]);
-      setProductId("");
       setNote("");
     } catch (error) {
       message.error("An error occurred while uploading images");
@@ -74,8 +72,9 @@ const UploadImgs = () => {
         <Form.Item label="Product ID">
           <Input
             value={productId}
-            onChange={e => setProductId(e.target.value)}
+            // onChange={e => setProductId(e.target.value)}
             placeholder="Enter product ID (optional)"
+            readOnly
           />
         </Form.Item>
         <Form.Item label="Note">
@@ -109,4 +108,4 @@ const UploadImgs = () => {
   );
 };
 
-export default UploadImgs;
+export default UploadImg3D;

@@ -2,8 +2,8 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
-import Media from "../../../Media";
-import { clamp } from "lodash";
+import UploadImgs from "../../../Upload";
+import UploadImg3D from "../../../Upload";
 
 const FormUpdate = () => {
   const [details, setDetails] = useState({});
@@ -131,6 +131,8 @@ const FormUpdate = () => {
     }
   };
 
+  console.log(details);
+
   return (
     <>
       <div style={{ padding: "20px" }}>
@@ -186,7 +188,7 @@ const FormUpdate = () => {
               <br />
               <p>Category: {details.category_name}</p>
               <br />
-              <p>
+              {/* <p>
                 Image:{" "}
                 <img
                   src={details.image}
@@ -194,6 +196,33 @@ const FormUpdate = () => {
                   alt="Product"
                 />
               </p>
+              <p>
+                Image 3D:{" "}
+                <img
+                  src={details.url_image}
+                  style={{ width: "300px", height: "auto" }}
+                  alt="Product"
+                />
+              </p> */}
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ flex: 1, marginRight: "10px" }}>
+                  <p>Image:</p>
+                  <img
+                    src={details.image}
+                    style={{ width: "100%", height: "auto" }}
+                    alt="Product"
+                  />
+                </div>
+                <div style={{ flex: 1, marginLeft: "10px" }}>
+                  <p>Image 3D:</p>
+                  <img
+                    src={details.url_image}
+                    style={{ width: "100%", height: "auto" }}
+                    alt="Product"
+                  />
+                </div>
+              </div>
+
               <br />
             </div>
           </TabPane>
@@ -281,7 +310,7 @@ const FormUpdate = () => {
 
           <TabPane tabId="4">
             <div className="mb-10" style={{ paddingTop: "5px" }}>
-              <Media />
+              <UploadImg3D productId={details.product_id} />
             </div>
           </TabPane>
         </TabContent>
