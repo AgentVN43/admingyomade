@@ -13,6 +13,7 @@ import {
 import Media from "../Media";
 import { Col, Container, Image, Row } from "react-bootstrap";
 import { map } from "lodash";
+import UploadFeaturedImg from "./upload";
 
 export default function Blog() {
   const [details, setDetails] = useState({});
@@ -25,6 +26,9 @@ export default function Blog() {
   const [allImages, setAllImages] = useState([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const [title, setTitle] = useState("");
+
+  const [featuredimageUrl, setFeaturedimageUrl] = useState("");
+
 
   const [formData, setFormData] = useState({
     title: "",
@@ -156,6 +160,10 @@ export default function Blog() {
   //   }
   // };
 
+  const handleImageUpload = (url) => {
+    setFeaturedimageUrl(url); // Store the uploaded image URL
+  };
+  
   const handleSubmit = async (event) => {
     setLoading(true);
     event.preventDefault();
@@ -168,6 +176,7 @@ export default function Blog() {
         content: editorRef.current?.getContent(),
         excerpt: formData.excerpt,
         slug: slug,
+        
       };
 
       if (!content.content) {
@@ -385,6 +394,9 @@ export default function Blog() {
         className="d-flex flex-column flex-row-fluid"
         style={{ width: "20%" }}
       >
+        <div style={{ backgroundColor: "red" }}>
+          <UploadFeaturedImg onImageUpload={handleImageUpload}/>
+        </div>
         <div className="d-flex flex-row-auto flex-center align-items-center">
           <Button
             type="submit"

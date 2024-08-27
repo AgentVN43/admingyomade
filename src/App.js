@@ -23,7 +23,7 @@ export default function App() {
             <Route path="dashboard" element={<Starter />} />
             <Route path="product" element={<Product />} />
             <Route path="media" element={<Media />} />
-            <Route path="upload" element={<UploadImgs />} />
+            {/* <Route path="upload" element={<UploadImgs />} /> */}
             <Route path="form/:id" element={<FormUpdate />} />
             <Route path="variants/:slug" element={<ProductVariants />} />
             <Route path="blog/add" element={<Blog />} />

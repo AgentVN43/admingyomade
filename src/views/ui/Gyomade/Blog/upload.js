@@ -3,9 +3,7 @@ import { Form, Upload, Modal, Input, Button, Spin, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 
-// Upload image 3d product
-
-const UploadImg3D = ({productId}) => {
+const UploadImg = ({ productId }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
@@ -18,12 +16,14 @@ const UploadImg3D = ({productId}) => {
   };
 
   const handleChange = ({ fileList }) => {
-    setFileList(fileList.map(file => {
-      if (!file.url && !file.preview) {
-        file.preview = URL.createObjectURL(file.originFileObj);
-      }
-      return file;
-    }));
+    setFileList(
+      fileList.map((file) => {
+        if (!file.url && !file.preview) {
+          file.preview = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      })
+    );
   };
 
   const handleCancel = () => setPreviewVisible(false);
@@ -37,24 +37,36 @@ const UploadImg3D = ({productId}) => {
     setLoading(true);
 
     try {
-      for (let file of fileList) {
-        const formData = new FormData();
-        formData.append('image', file.originFileObj);
-        formData.append('product_id', productId.trim());
-        formData.append('note', note.trim());
+      const file = fileList[0];
+      const formData = new FormData();
+      formData.append("image", file.originFileObj);
+      formData.append("product_id", null);
+      formData.append("note", null);
 
-        await axios.post('https://gyomade.vn/mvc/images/upload', formData, {
+      const response = await axios.post(
+        "https://gyomade.vn/mvc/images/upload",
+        formData,
+        {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        });
+        }
+      );
+
+      // Extract the single URL from the response
+      const { url_image } = response.data.data;
+      if (url_image) {
+        console.log("Uploaded Image URL:", url_image);
+        message.success("Image uploaded successfully");
+        // You can now use the `url_image` as needed
+      } else {
+        message.error("Failed to get image URL from the server.");
       }
 
-      message.success("All images uploaded successfully");
       setFileList([]);
       setNote("");
     } catch (error) {
-      message.error("An error occurred while uploading images");
+      message.error("An error occurred while uploading the image");
       console.error(error);
     } finally {
       setLoading(false);
@@ -71,28 +83,13 @@ const UploadImg3D = ({productId}) => {
   return (
     <>
       <Form layout="vertical">
-        <Form.Item label="Product ID">
-          <Input
-            value={productId}
-            // onChange={e => setProductId(e.target.value)}
-            placeholder="Enter product ID (optional)"
-            readOnly
-          />
-        </Form.Item>
-        <Form.Item label="Note">
-          <Input
-            value={note}
-            onChange={e => setNote(e.target.value)}
-            placeholder="Enter note (optional)"
-          />
-        </Form.Item>
-        <Form.Item label="Images">
+        <Form.Item label="Upload Images">
           <Upload
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
             onChange={handleChange}
-            beforeUpload={() => false}  // Prevent auto upload
+            beforeUpload={() => false} // Prevent auto upload
           >
             {fileList.length >= 8 ? null : uploadButton}
           </Upload>
@@ -110,4 +107,4 @@ const UploadImg3D = ({productId}) => {
   );
 };
 
-export default UploadImg3D;
+export default UploadImg;

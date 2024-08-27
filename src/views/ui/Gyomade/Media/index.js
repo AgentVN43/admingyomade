@@ -1,116 +1,80 @@
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import "./index.scss";
-// import { Col, Container, Image, Row } from "react-bootstrap";
-
-// const Media = () => {
-//   const [selectedImage, setSelectedImage] = useState(null);
-//   const [allImages, setAllImages] = useState([]);
-
-//   const [note, setNote] = useState("");
-//   const { id } = useParams();
-
-//   const handleImageChange = (event) => {
-//     setSelectedImage(event.target.files[0]);
-//   };
-
-//   const fetchData = async () => {
-//     try {
-//       const response = await fetch(`https://gyomade.vn/mvc/images`);
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       }
-//       const data = await response.json();
-//       setAllImages(data.images);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   const handleUpload = () => {
-//     if (!selectedImage) {
-//       alert("Please select an image");
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append("image", selectedImage);
-//     formData.append("product_id", id);
-//     formData.append("note", note);
-
-//     fetch("https://cdn.annk.info/upload", {
-//       method: "POST",
-//       body: formData,
-//     })
-//       .then((response) => {
-//         if (response.ok) {
-//           alert("Image uploaded successfully!");
-//           setSelectedImage(null);
-//           setNote("");
-//           fetchData();
-//         } else {
-//           alert("Error uploading image.");
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("Error:", error);
-//         alert("Error uploading image.");
-//       });
-//   };
-
-//   console.log(allImages);
-
-//   return (
-//     <>
-//       <div>
-//         <input type="file" accept="image/*" onChange={handleImageChange} />
-//         <input
-//           type="text"
-//           placeholder="Alt tex for SEO"
-//           value={note}
-//           onChange={(e) => setNote(e.target.value)}
-//         />
-//         <button onClick={handleUpload}>Upload</button>
-//         {selectedImage && (
-//           <div>
-//             <h2>Selected Image:</h2>
-//             <img
-//               src={URL.createObjectURL(selectedImage)}
-//               alt="Selected"
-//               style={{ maxWidth: "10%" }}
-//             />
-//           </div>
-//         )}
-//       </div>
-//       <Container>
-//         <Row>
-//           {allImages.map((image, index) => (
-//             <Col md={4} key={index}>
-//               <div className="img-card">
-//                 <Image
-//                   style={{ width: "300px", height: "300px" }}
-//                   thumbnail
-//                   src={image.url_image}
-//                   alt={`Image ${index + 1}`}
-//                 />
-//               </div>
-//             </Col>
-//           ))}
-//         </Row>
-//       </Container>
-//     </>
-//   );
-// };
-
-// export default Media;
-import React from 'react'
+import { Card, Col, Pagination, Row, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import UploadImg from "../Blog/upload";
 
 export default function Media() {
+  const [gallery, setGallery] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalEntries, setTotalEntries] = useState(0);
+
+  const fetchData = async (page) => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetch(
+        `https://gyomade.vn/mvc/images?page_number=${page}`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setGallery(data.images);
+      setPageSize(data.page_size); // Keep track of the page size from the backend
+      setPageNumber(data.page_number);
+      setTotalEntries(data.total_entries); // Set total number of entries
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    fetchData(pageNumber);
+  }, [pageNumber]);
+
+  const handlePageChange = (page) => {
+    setPageNumber(page); // Only handle page number changes
+  };
+
   return (
-    <div>index</div>
-  )
+    <>
+      <div style={{ padding: "20px" }}>
+        <UploadImg />
+        {loading ? (
+          <Spin size="large" />
+        ) : (
+          <>
+            <Row gutter={[16, 16]}>
+              {gallery.map((item) => (
+                <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+                  <Card
+                    hoverable
+                    cover={
+                      <img
+                        alt={`${item.id}`}
+                        src={item.url_image}
+                        style={{ width: "100%", height: "50%" }}
+                      />
+                    }
+                  >
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+            <Pagination
+              current={pageNumber}
+              pageSize={pageSize} // Keep using the page size from the backend
+              total={totalEntries} // Set total number of entries
+              onChange={handlePageChange}
+              style={{ marginTop: "20px", textAlign: "center" }}
+            />
+          </>
+        )}
+      </div>
+    </>
+  );
 }

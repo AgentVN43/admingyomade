@@ -20,11 +20,6 @@ const navigation = [
     icon: "bi bi-images",
   },
   {
-    title: "Upload images",
-    href: "/upload",
-    icon: "bi bi-images",
-  },
-  {
     title: "Blog",
     href: "/blog",
     icon: "bi bi-newspaper",
