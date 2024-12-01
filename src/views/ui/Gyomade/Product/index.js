@@ -19,7 +19,12 @@ export default function Product() {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        setProducts(data.products);
+
+        const sortedProducts = data.products.sort(
+          (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
+        );
+
+        setProducts(sortedProducts);
         setTotalPages(data.total_pages);
         console.log(`Data fetched for ID ${id}:`, data);
       } catch (error) {
@@ -68,9 +73,7 @@ export default function Product() {
     fetchProductDetails();
   }, [products]);
 
-
-
-  console.log(products)
+  console.log(products);
 
   const checkContent = (slug) => {
     const detail = productDetail.find((item) => item.slug === slug);
@@ -167,7 +170,7 @@ export default function Product() {
                     </td>
                     <td>
                       <img
-                        src={product.url_image}
+                        src={product.thumbnail_url}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -188,6 +191,7 @@ export default function Product() {
                 ))}
               </tbody>
             </table>
+           
           </TabPane>
 
           <TabPane tabId="1231641">
@@ -227,7 +231,7 @@ export default function Product() {
                     </td>
                     <td>
                       <img
-                        src={product.url_image}
+                        src={product.thumbnail_url}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -287,7 +291,7 @@ export default function Product() {
                     </td>
                     <td>
                       <img
-                        src={product.url_image}
+                        src={product.thumbnail_url}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -347,7 +351,7 @@ export default function Product() {
                     </td>
                     <td>
                       <img
-                        src={product.url_image}
+                        src={product.thumbnail_url}
                         style={{ width: "100px", height: "auto" }}
                         alt="product"
                       />
@@ -373,7 +377,6 @@ export default function Product() {
 
         <nav aria-label="Page navigation">
           <ul className="pagination">
-            {/* Previous button */}
             <li className={`page-item ${currentPage <= 1 ? "disabled" : ""}`}>
               <a
                 className="page-link"
@@ -388,7 +391,6 @@ export default function Product() {
               </a>
             </li>
 
-            {/* Page numbers */}
             {pageNumbers.map((page) => (
               <li
                 key={page}
@@ -407,7 +409,6 @@ export default function Product() {
               </li>
             ))}
 
-            {/* Next button */}
             <li
               className={`page-item ${
                 currentPage >= totalPages ? "disabled" : ""

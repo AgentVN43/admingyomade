@@ -79,7 +79,7 @@ const UploadImg3D = ({productId}) => {
             readOnly
           />
         </Form.Item>
-        <Form.Item label="Note">
+        <Form.Item label="Note: thumbnail để chọn ảnh sp">
           <Input
             value={note}
             onChange={e => setNote(e.target.value)}
@@ -93,6 +93,7 @@ const UploadImg3D = ({productId}) => {
             onPreview={handlePreview}
             onChange={handleChange}
             beforeUpload={() => false}  // Prevent auto upload
+            multiple
           >
             {fileList.length >= 8 ? null : uploadButton}
           </Upload>

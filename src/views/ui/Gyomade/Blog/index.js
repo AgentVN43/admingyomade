@@ -1,21 +1,18 @@
 import { Editor } from "@tinymce/tinymce-react";
 import React, { useEffect, useRef, useState } from "react";
+import { Col, Container, Image, Row } from "react-bootstrap";
 import {
   Button,
-  ButtonGroup,
   Input,
-  Label,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
 } from "reactstrap";
-import Media from "../Media";
-import { Col, Container, Image, Row } from "react-bootstrap";
-import { map } from "lodash";
-import UploadFeaturedImg from "./upload";
+import MediaModal from "../MediaModal";
+import ImageSelectModal from "./modal";
 
-export default function Blog() {
+export default function Blog({ image }) {
   const [details, setDetails] = useState({});
   const [categories, setCategories] = useState({});
 
@@ -29,12 +26,14 @@ export default function Blog() {
 
   const [featuredimageUrl, setFeaturedimageUrl] = useState("");
 
+  const [selectedFeaturedImage, setFeaturedImage] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
     categories: [],
     slug: "",
+    featured_images: "",
   });
 
   const editorRef = useRef(null);
@@ -163,20 +162,29 @@ export default function Blog() {
   const handleImageUpload = (url) => {
     setFeaturedimageUrl(url); // Store the uploaded image URL
   };
-  
+
+  const handleSelectFeaturedImage = (imageUrl) => {
+    setFeaturedImage(imageUrl);
+  };
+
+  useEffect(() => {
+    handleSelectFeaturedImage(imageUrl);
+  }, [imageUrl]);
+
   const handleSubmit = async (event) => {
-    setLoading(true);
     event.preventDefault();
+    setLoading(true);
 
     try {
       const slug = formData.slug || generateSlug(formData.title);
+      const featured = selectedFeaturedImage
 
       const content = {
         title: formData.title,
         content: editorRef.current?.getContent(),
         excerpt: formData.excerpt,
         slug: slug,
-        
+        featured_images: featured,
       };
 
       if (!content.content) {
@@ -209,8 +217,6 @@ export default function Blog() {
     }
   };
 
-  console.log(categories);
-
   const fetchData = async () => {
     try {
       const response = await fetch(`https://gyomade.vn/mvc/blog/`);
@@ -225,16 +231,31 @@ export default function Blog() {
     }
   };
 
-  const handleImageSelect = (imageUrl) => {
-    // Insert the image URL into the editor
+  // const handleImageSelect = (imageUrl) => {
+  //   // Insert the image URL into the editor
+  //   if (editorRef.current) {
+  //     editorRef.current.execCommand(
+  //       "mceInsertContent",
+  //       false,
+  //       `<img src="${imageUrl}" alt=""/>`
+  //     );
+  //     setModalOpen(false);
+  //     setImageUrl("");
+  //   }
+  // };
+
+  const handleImageSelect = (imageUrls) => {
     if (editorRef.current) {
-      editorRef.current.execCommand(
-        "mceInsertContent",
-        false,
-        `<img src="${imageUrl}" alt=""/>`
-      );
+      // Create a string with multiple image tags
+      const imagesHTML = imageUrls
+        .map(
+          (url) =>
+            `<img src="${url}" alt="" style="width: 300px; height: auto; margin: 5px;"/><br/>`
+        )
+        .join("");
+      editorRef.current.execCommand("mceInsertContent", false, imagesHTML);
       setModalOpen(false);
-      setImageUrl("");
+      setImageUrl(""); // You can remove this if not needed for multiple images
     }
   };
 
@@ -281,145 +302,116 @@ export default function Blog() {
   };
 
   const insertSelectedImage = () => {
-    // Do something with the selected image URL, e.g., insert it into the editor
     console.log("Selected Image URL:", selectedImageUrl);
-    // Close the modal
     toggleModal();
   };
 
   return (
-    <div className="d-flex flex-row h-300px">
-      <div
-        className="d-flex flex-column flex-row-fluid"
-        style={{ width: "100%" }}
-      >
-        <div className="d-flex flex-row flex-column-fluid">
-          <div className="d-flex flex-row-fluid flex-center">
-            <form
-              onSubmit={handleSubmit}
-              id="form-content"
-              style={{ width: "100%" }}
+    <>
+      <div className="d-flex flex-row h-300px">
+        <div
+          className="d-flex flex-column flex-row-fluid"
+          style={{ width: "100%" }}
+        >
+          <div className="d-flex flex-row flex-column-fluid">
+            <div className="d-flex flex-row-fluid flex-center">
+              <form
+                onSubmit={handleSubmit}
+                id="form-content"
+                style={{ width: "100%" }}
+              >
+                <Input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Title"
+                />
+                <Input
+                  type="text"
+                  name="excerpt"
+                  value={formData.excerpt}
+                  onChange={handleInputChange}
+                  placeholder="Excerpt"
+                />
+                <Input
+                  type="text"
+                  name="slug"
+                  value={formData.slug}
+                  onChange={handleInputChange}
+                  placeholder="Slug: nếu để trống slug sẽ được tạo tự động"
+                />
+
+                <Editor
+                  apiKey="y5p4huxtuvw2boq9u0zk1xehkzsmcaxdll89coa6klob7kcp"
+                  onInit={(evt, editor) => (editorRef.current = editor)}
+                  init={{
+                    width: "100%",
+                    plugins:
+                      "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
+                    toolbar:
+                      "annk | undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat ",
+                    setup: function (editor) {
+                      editor.ui.registry.addButton("annk", {
+                        icon: "user",
+                        tooltip: "AnNK Button",
+                        onAction: function () {
+                          toggleModal();
+                        },
+                      });
+                    },
+                    tinycomments_mode: "embedded",
+                    tinycomments_author: "Author name",
+                    ai_request: (request, respondWith) =>
+                      respondWith.string(() =>
+                        Promise.reject("See docs to implement AI Assistant")
+                      ),
+                  }}
+                  initialValue={details.content}
+                />
+                <ImageSelectModal
+                  visible={modalOpen}
+                  toggle={toggleModal}
+                  allImages={allImages}
+                  handleImageSelect={handleImageSelect}
+                  insertSelectedImage={insertSelectedImage}
+                />
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="d-flex flex-column flex-row-fluid"
+          style={{ width: "20%" }}
+        >
+          <div>
+            <MediaModal onSelectImage={handleSelectFeaturedImage} />
+          </div>
+          <div className="d-flex flex-row-auto flex-center align-items-center">
+            <Button
+              type="submit"
+              form="form-content"
+              className={`btn btn-primary ${loading ? "" : "me-10"}`}
+              onClick={handleSubmit}
+              disabled={loading} // Disable button when in loading state
+              data-kt-indicator={loading ? "on" : undefined} // Apply data-kt-indicator attribute when in loading state
             >
-              <Input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Title"
-              />
-              <Input
-                type="text"
-                name="excerpt"
-                value={formData.excerpt}
-                onChange={handleInputChange}
-                placeholder="Excerpt"
-              />
-              <Input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleInputChange}
-                placeholder="Slug: nếu để trống slug sẽ được tạo tự động"
-              />
-
-              <Editor
-                apiKey="y5p4huxtuvw2boq9u0zk1xehkzsmcaxdll89coa6klob7kcp"
-                onInit={(evt, editor) => (editorRef.current = editor)}
-                init={{
-                  width: "100%",
-                  plugins:
-                    "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
-                  toolbar:
-                    "annk | undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat ",
-                  setup: function (editor) {
-                    // Add event listener for custom button
-                    editor.ui.registry.addButton("annk", {
-                      icon: "user", // Specify icon for the button
-                      tooltip: "AnNK Button", // Tooltip for the button
-                      onAction: function () {
-                        // Define action when button is clicked
-                        // handleCustomButtonClick();
-                        toggleModal();
-                      },
-                    });
-                  },
-                  tinycomments_mode: "embedded",
-                  tinycomments_author: "Author name",
-                  ai_request: (request, respondWith) =>
-                    respondWith.string(() =>
-                      Promise.reject("See docs to implement AI Assistant")
-                    ),
-                }}
-                initialValue={details.content}
-              />
-            </form>
-
-            <Modal isOpen={modalOpen} toggle={toggleModal}>
-              <ModalHeader toggle={toggleModal}>Select Image</ModalHeader>
-              <ModalBody>
-                <Container>
-                  <Row>
-                    {allImages.map((image, index) => (
-                      <Col md={3} key={index}>
-                        <div
-                          className="img-card"
-                          onClick={() => handleImageSelect(image.url_image)}
-                        >
-                          <Image
-                            style={{ width: "50%", height: "300px" }}
-                            thumbnail
-                            src={image.url_image}
-                            alt={`Image ${index + 1}`}
-                          />
-                        </div>
-                      </Col>
-                    ))}
-                  </Row>
-                </Container>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onClick={insertSelectedImage}>
-                  Insert Image
-                </Button>{" "}
-                <Button color="secondary" onClick={toggleModal}>
-                  Cancel
-                </Button>
-              </ModalFooter>
-            </Modal>
+              <span className="indicator-label">Submit</span>
+              {loading && (
+                <span className="indicator-progress">
+                  Please wait...{" "}
+                  <span
+                    className="spinner-border spinner-border-sm align-middle ms-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                </span>
+              )}
+            </Button>
           </div>
         </div>
       </div>
-
-      <div
-        className="d-flex flex-column flex-row-fluid"
-        style={{ width: "20%" }}
-      >
-        <div style={{ backgroundColor: "red" }}>
-          <UploadFeaturedImg onImageUpload={handleImageUpload}/>
-        </div>
-        <div className="d-flex flex-row-auto flex-center align-items-center">
-          <Button
-            type="submit"
-            form="form-content"
-            className={`btn btn-primary ${loading ? "" : "me-10"}`}
-            onClick={handleSubmit}
-            disabled={loading} // Disable button when in loading state
-            data-kt-indicator={loading ? "on" : undefined} // Apply data-kt-indicator attribute when in loading state
-          >
-            <span className="indicator-label">Submit</span>
-            {loading && (
-              <span className="indicator-progress">
-                Please wait...{" "}
-                <span
-                  className="spinner-border spinner-border-sm align-middle ms-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-              </span>
-            )}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
